@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="100" fill="#e6e6e6"/>
+  
+  <!-- Head -->
+  <circle cx="100" cy="85" r="40" fill="#4361ee"/>
+  
+  <!-- Body -->
+  <path d="M100,135 C65,135 40,160 40,200 L160,200 C160,160 135,135 100,135 Z" fill="#4361ee"/>
+  
+  <!-- Shirt collar -->
+  <path d="M100,135 C85,135 75,140 70,150 L130,150 C125,140 115,135 100,135 Z" fill="white"/>
+  
+  <!-- Face features - simplified representation -->
+  <circle cx="85" cy="80" r="5" fill="white"/> <!-- Left eye -->
+  <circle cx="115" cy="80" r="5" fill="white"/> <!-- Right eye -->
+  <path d="M85,110 C85,115 115,115 115,110" stroke="white" stroke-width="2" fill="none"/> <!-- Smile -->
+  
+  <!-- Beard - simplified representation -->
+  <path d="M70,100 C80,120 120,120 130,100 L130,115 C120,130 80,130 70,115 Z" fill="#333"/>
+</svg>
