@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - Admin Dashboard</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Additional styles specific to messages page */
+        .messages-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            height: calc(100vh - 180px);
+        }
+        
+        .contacts-list {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            overflow-y: auto;
+        }
+        
+        .contacts-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .contacts-search {
+            display: flex;
+            align-items: center;
+            background-color: #f5f7fb;
+            border-radius: 30px;
+            padding: 8px 15px;
+            margin-top: 10px;
+        }
+        
+        .contacts-search input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 100%;
+            padding-left: 10px;
+            color: var(--text-color);
+        }
+        
+        .contacts-search i {
+            color: var(--text-muted);
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .contact-item:hover, .contact-item.active {
+            background-color: #f5f7fb;
+        }
+        
+        .contact-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 15px;
+            position: relative;
+        }
+        
+        .contact-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .online-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #28a745;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            border: 2px solid white;
+        }
+        
+        .contact-info {
+            flex: 1;
+        }
+        
+        .contact-name {
+            font-weight: 500;
+            margin-bottom: 3px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .contact-time {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .contact-preview {
+            font-size: 13px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 180px;
+        }
+        
+        .unread-badge {
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 5px;
+        }
+        
+        .chat-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-header {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .chat-header .contact-avatar {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .chat-header .contact-info {
+            margin-right: auto;
+        }
+        
+        .chat-header .contact-name {
+            margin-bottom: 0;
+        }
+        
+        .chat-header .contact-status {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .chat-header .chat-actions i {
+            font-size: 18px;
+            color: var(--text-muted);
+            margin-left: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .chat-header .chat-actions i:hover {
+            color: var(--primary-color);
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message {
+            max-width: 70%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            position: relative;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 5px;
+            text-align: right;
+        }
+        
+        .message.received {
+            background-color: #f5f7fb;
+            align-self: flex-start;
+            border-bottom-left-radius: 0;
+        }
+        
+        .message.sent {
+            background-color: var(--primary-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 0;
+        }
+        
+        .message.sent .message-time {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .chat-input {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .chat-input input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 10px 15px;
+            border-radius: 30px;
+            background-color: #f5f7fb;
+        }
+        
+        .chat-input-actions {
+            display: flex;
+            align-items: center;
+            margin-right: 10px;
+        }
+        
+        .chat-input-actions i {
+            font-size: 18px;
+            color: var(--text-muted);
+            margin-right: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .chat-input-actions i:hover {
+            color: var(--primary-color);
+        }
+        
+        .send-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .send-btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 992px) {
+            .messages-container {
+                grid-template-columns: 250px 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .messages-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .contacts-list {
+                height: 300px;
+            }
+            
+            .chat-container {
+                height: 500px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Admin<span>Panel</span></h2>
+            </div>
+            <div class="sidebar-menu">
+                <ul>
+                    <li>
+                        <a href="../index.html">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Analytics</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="messages.html">
+                            <i class="fas fa-envelope"></i>
+                            <span>Messages</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="products.html">
+                            <i class="fas fa-box"></i>
+                            <span>Products</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="reports.html">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="settings.html">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Navigation -->
+            <header class="top-nav">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search...">
+                </div>
+                <div class="user-actions">
+                    <div class="notification">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count">3</span>
+                        <div class="notification-dropdown">
+                            <div class="notification-item">
+                                <div class="notification-icon"><i class="fas fa-user-plus"></i></div>
+                                <div class="notification-text">
+                                    <p>New user registered</p>
+                                    <span>2 minutes ago</span>
+                                </div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="notification-icon"><i class="fas fa-shopping-cart"></i></div>
+                                <div class="notification-text">
+                                    <p>New order received</p>
+                                    <span>1 hour ago</span>
+                                </div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="notification-icon"><i class="fas fa-exclamation-circle"></i></div>
+                                <div class="notification-text">
+                                    <p>Server limit reached</p>
+                                    <span>2 hours ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-profile">
+                        <img src="../assets/profile.jpg" alt="Ujjwal Singh" id="profile-img">
+                        <div class="user-info-dropdown">
+                            <div class="user-info-header">
+                                <img src="../assets/profile.jpg" alt="Ujjwal Singh">
+                                <div>
+                                    <h4>Ujjwal Singh</h4>
+                                    <p>Administrator</p>
+                                </div>
+                            </div>
+                            <div class="user-info-body">
+                                <div class="info-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span>6395145388</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>ujjwal@example.com</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>New Delhi, India</span>
+                                </div>
+                            </div>
+                            <div class="user-info-footer">
+                                <a href="#"><i class="fas fa-user-cog"></i> Profile Settings</a>
+                                <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <div class="page-header">
+                    <h1>Messages</h1>
+                    <p>Manage your conversations</p>
+                </div>
+
+                <!-- Messages Container -->
+                <div class="messages-container">
+                    <!-- Contacts List -->
+                    <div class="contacts-list">
+                        <div class="contacts-header">
+                            <h3>Conversations</h3>
+                            <div class="contacts-search">
+                                <i class="fas fa-search"></i>
+                                <input type="text" placeholder="Search contacts...">
+                            </div>
+                        </div>
+                        <div class="contact-item active">
+                            <div class="contact-avatar">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="John Doe">
+                                <span class="online-status"></span>
+                            </div>
+                            <div class="contact-info">
+                                <div class="contact-name">
+                                    <span>John Doe</span>
+                                    <span class="contact-time">10:42 AM</span>
+                                </div>
+                                <div class="contact-preview">Hey, I wanted to ask about the new product...</div>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-avatar">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Sarah Williams">
+                            </div>
+                            <div class="contact-info">
+                                <div class="contact-name">
+                                    <span>Sarah Williams</span>
+                                    <span class="contact-time">Yesterday</span>
+                                </div>
+                                <div class="contact-preview">Thank you for your quick response!</div>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-avatar">
+                                <img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Michael Brown">
+                                <span class="online-status"></span>
+                            </div>
+                            <div class="contact-info">
+                                <div class="contact-name">
+                                    <span>Michael Brown</span>
+                                    <span class="contact-time">Yesterday</span>
+                                </div>
+                                <div class="contact-preview">I've reviewed the report and have some feedback...</div>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-avatar">
+                                <img src="https://randomuser.me/api/portraits/women/33.jpg" alt="Emily Johnson">
+                            </div>
+                            <div class="contact-info">
+                                <div class="contact-name">
+                                    <span>Emily Johnson</span>
+                                    <span class="contact-time">2 days ago</span>
+                                </div>
+                                <div class="contact-preview">Can we schedule a meeting for next week?</div>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-avatar">
+                                <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="David Wilson">
+                            </div>
+                            <div class="contact-info">
+                                <div class="contact-name">
+                                    <span>David Wilson</span>
+                                    <span class="contact-time">3 days ago</span>
+                                </div>
+                                <div class="contact-preview">The latest update looks great! I especially like...</div>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-avatar">
+                                <img src="https://randomuser.me/api/portraits/women/56.jpg" alt="Jennifer Lee">
+                                <span class="online-status"></span>
+                            </div>
+                            <div class="contact-info">
+                                <div class="contact-name">
+                                    <span>Jennifer Lee</span>
+                                    <span class="contact-time">1 week ago</span>
+                                </div>
+                                <div class="contact-preview">I'm having an issue with my account. Can you help?</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Container -->
+                    <div class="chat-container">
+                        <div class="chat-header">
+                            <div class="contact-avatar">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="John Doe">
+                                <span class="online-status"></span>
+                            </div>
+                            <div class="contact-info">
+                                <div class="contact-name">John Doe</div>
+                                <div class="contact-status">Online</div>
+                            </div>
+                            <div class="chat-actions">
+                                <i class="fas fa-phone"></i>
+                                <i class="fas fa-video"></i>
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                        </div>
+                        <div class="chat-messages">
+                            <div class="message received">
+                                <div class="message-content">Hey Ujjwal, I wanted to ask about the new product launch. When is it scheduled?</div>
+                                <div class="message-time">10:30 AM</div>
+                            </div>
+                            <div class="message sent">
+                                <div class="message-content">Hi John! The new product launch is scheduled for next month, on the 15th. We're finalizing the marketing materials now.</div>
+                                <div class="message-time">10:32 AM</div>
+                            </div>
+                            <div class="message received">
+                                <div class="message-content">That's great! Will there be a press release?</div>
+                                <div class="message-time">10:33 AM</div>
+                            </div>
+                            <div class="message sent">
+                                <div class="message-content">Yes, we're preparing a press release and planning a virtual event for the launch. I'll send you the details once they're finalized.</div>
+                                <div class="message-time">10:35 AM</div>
+                            </div>
+                            <div class="message received">
+                                <div class="message-content">Perfect! I'm excited to see the new features. I heard there are some significant improvements.</div>
+                                <div class="message-time">10:38 AM</div>
+                            </div>
+                            <div class="message sent">
+                                <div class="message-content">Absolutely! We've added AI-powered recommendations, a completely redesigned interface, and improved performance by 40%. Users are going to love it!</div>
+                                <div class="message-time">10:40 AM</div>
+                            </div>
+                            <div class="message received">
+                                <div class="message-content">That sounds impressive! Can I get early access to test it out?</div>
+                                <div class="message-time">10:42 AM</div>
+                            </div>
+                        </div>
+                        <div class="chat-input">
+                            <div class="chat-input-actions">
+                                <i class="fas fa-paperclip"></i>
+                                <i class="far fa-smile"></i>
+                                <i class="fas fa-microphone"></i>
+                            </div>
+                            <input type="text" placeholder="Type a message...">
+                            <div class="send-btn">
+                                <i class="fas fa-paper-plane"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../js/main.js"></script>
+</body>
+</html>
